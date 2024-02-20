@@ -1,3 +1,4 @@
+import { requestHandler } from 'request_handler/reqHandler';
 import { WebSocketServer } from 'ws';
 
 const WS_PORT = 3000;
@@ -8,10 +9,11 @@ console.log(`WebSocket server started on port ${WS_PORT}`);
 
 wsServer.on('connection', (webSocket, request) => {
   console.log('WebSocket connected');
-  console.log(request.socket);
   webSocket.on('message', (message) => {
-    console.log('Received message:', message);
-    webSocket.send(`Response from server: ${message}`);
+    const data = JSON.parse(message.toString());
+    console.log('Received message:', data);
+    requestHandler(webSocket, data)
+    
   });
 });
 
