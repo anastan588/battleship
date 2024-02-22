@@ -8,7 +8,7 @@ export function createRoom(webSocket, roomData) {
     roomId: roomId,
     roomUsers: [],
   };
-  const newRoomId = roomId +1;
+  const newRoomId = roomId + 1;
   setRoomId(newRoomId);
   addPlayerToNewRoom(webSocket, newRoom);
   rooms.push(newRoom);

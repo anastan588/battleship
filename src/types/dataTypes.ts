@@ -31,6 +31,7 @@ export interface RoomUpdateData {
 export interface RoomUser {
   name: string;
   index: number;
+  shipInfo?: undefined;
 }
 
 export interface Game {

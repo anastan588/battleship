@@ -1,6 +1,6 @@
 import { rooms, roomsInGame } from 'dataBase/gameDataBase';
 import WebSocketWithId, { Game, Room, RoomUpdateData } from 'types/dataTypes';
-import { createGame } from './createGame';
+import { createGame } from '../game/createGame';
 
 export function addSecondPlayerToRoom(webSocket: WebSocketWithId, roomData) {
   const roomToAddRequest = JSON.parse(roomData.data);

@@ -1,6 +1,10 @@
-import { currentPlayersOfGame, players, wsConnections } from 'dataBase/gameDataBase';
+import {
+  currentPlayersOfGame,
+  players,
+  wsConnections,
+} from 'dataBase/gameDataBase';
 import WebSocketWithId, { ResponseRegistration, User } from 'types/dataTypes';
-import { sendListRooms } from './upDateRoomResponse';
+import { sendListRooms } from '../room/upDateRoomResponse';
 
 export function registerCreateUser(webSocket: WebSocketWithId, userData) {
   const response = {
@@ -32,7 +36,7 @@ export function registerCreateUser(webSocket: WebSocketWithId, userData) {
     }
     response.data = JSON.stringify(resPlayerData);
     webSocket.send(JSON.stringify(response));
-    if (findPlayer[0].password === password)  {
+    if (findPlayer[0].password === password) {
       sendListRooms(wsConnections);
     }
   } else if (findPlayer.length === 0) {

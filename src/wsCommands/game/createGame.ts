@@ -1,11 +1,10 @@
 import {
   games,
-  rooms,
   roomsInGame,
   wsConnections,
 } from 'dataBase/gameDataBase';
 import WebSocketWithId, { Game, Room } from 'types/dataTypes';
-import { sendListRooms } from './upDateRoomResponse';
+import { sendListRooms } from '../room/upDateRoomResponse';
 
 export function createGame(webSocket: WebSocketWithId, roomIndex) {
   const response = {
@@ -16,7 +15,7 @@ export function createGame(webSocket: WebSocketWithId, roomIndex) {
   const responseData = {
     idGame: 0,
     idPlayer: 0,
-  }
+  };
   const newGame: Game = {
     idGame: games.length,
     players: [],
