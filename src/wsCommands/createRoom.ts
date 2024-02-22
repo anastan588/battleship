@@ -1,17 +1,16 @@
-import { rooms } from 'dataBase/gameDataBase';
+import { roomId, rooms, setRoomId, wsConnections } from 'dataBase/gameDataBase';
 import { Room } from 'types/dataTypes';
+import { addPlayerToNewRoom } from './addPlayerToRoom';
+import { sendListRooms } from './upDateRoomResponse';
 
 export function createRoom(webSocket, roomData) {
-  const response = {
-    id: 0,
-    type: roomData.type,
-    data: '',
-  };
-  const newPlayer: Room = {
-    roomId: rooms.length,
+  const newRoom: Room = {
+    roomId: roomId,
     roomUsers: [],
   };
-  rooms.push(newPlayer);
-  webSocket.send(`Roow with id ${newPlayer.roomId} registered`);
-  console.log(rooms);
+  const newRoomId = roomId +1;
+  setRoomId(newRoomId);
+  addPlayerToNewRoom(webSocket, newRoom);
+  rooms.push(newRoom);
+  sendListRooms(wsConnections);
 }

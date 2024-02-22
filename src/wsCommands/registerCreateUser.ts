@@ -1,14 +1,15 @@
-import { players } from 'dataBase/gameDataBase';
-import { ResponseRegistration, User } from 'types/dataTypes';
+import { currentPlayersOfGame, players, wsConnections } from 'dataBase/gameDataBase';
+import WebSocketWithId, { ResponseRegistration, User } from 'types/dataTypes';
+import { sendListRooms } from './upDateRoomResponse';
 
-export function registerCreateUser(webSocket, userData) {
+export function registerCreateUser(webSocket: WebSocketWithId, userData) {
   const response = {
     id: 0,
     type: userData.type,
     data: '',
   };
   const { name, password } = JSON.parse(userData.data);
-  const findPlayer = players.filter((item) => (item.name = name));
+  const findPlayer = players.filter((item) => item.name === name);
   console.log(findPlayer);
   if (findPlayer.length === 1) {
     let resPlayerData: ResponseRegistration = {
@@ -25,20 +26,34 @@ export function registerCreateUser(webSocket, userData) {
         errorText: 'Your Password is wrong',
       };
     }
+    if (findPlayer[0].password === password) {
+      currentPlayersOfGame.push(findPlayer[0]);
+      webSocket.wsUser = findPlayer[0];
+    }
     response.data = JSON.stringify(resPlayerData);
     webSocket.send(JSON.stringify(response));
+    if (findPlayer[0].password === password)  {
+      sendListRooms(wsConnections);
+    }
   } else if (findPlayer.length === 0) {
     createPlayer(webSocket, name, password, response);
   }
 }
 
-function createPlayer(webSocket, username, userpassword, response) {
+function createPlayer(
+  webSocket: WebSocketWithId,
+  username,
+  userpassword,
+  response
+) {
   const newPlayer: User = {
     index: players.length,
     name: username,
     password: userpassword,
   };
   console.log(newPlayer);
+  currentPlayersOfGame.push(newPlayer);
+  webSocket.wsUser = newPlayer;
   players.push(newPlayer);
   const resPlayerData: ResponseRegistration = {
     index: newPlayer.index,
@@ -49,4 +64,5 @@ function createPlayer(webSocket, username, userpassword, response) {
   response.data = JSON.stringify(resPlayerData);
   webSocket.send(JSON.stringify(response));
   console.log(players);
+  sendListRooms(wsConnections);
 }
