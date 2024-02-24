@@ -3,7 +3,7 @@ import {
   roomsInGame,
   wsConnections,
 } from 'dataBase/gameDataBase';
-import WebSocketWithId, { Game, Room } from 'types/dataTypes';
+import WebSocketWithId, { Game } from 'types/dataTypes';
 import { sendListRooms } from '../room/upDateRoomResponse';
 
 export function createGame(webSocket: WebSocketWithId, roomIndex) {

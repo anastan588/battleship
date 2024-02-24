@@ -1,8 +1,8 @@
 import { addSecondPlayerToRoom } from 'wsCommands/room/addSecondPlayerToRoom';
-import { createGame } from 'wsCommands/game/createGame';
 import { createRoom } from 'wsCommands/room/createRoom';
 import { registerCreateUser } from 'wsCommands/user/registerCreateUser';
 import { startGame } from 'wsCommands/game/startGame';
+import { attack } from 'wsCommands/game/attack';
 
 export function requestHandler(webSocket, data) {
   switch (data.type) {
@@ -19,6 +19,9 @@ export function requestHandler(webSocket, data) {
     case 'add_ships':
       startGame(webSocket, data);
       break;
+    case 'attack':
+        attack(webSocket, data);
+        break;  
     default:
       break;
   }

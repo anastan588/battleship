@@ -1,5 +1,8 @@
-import { games, players, wsConnections } from 'dataBase/gameDataBase';
+import { games, wsConnections } from 'dataBase/gameDataBase';
 import WebSocketWithId from 'types/dataTypes';
+import { generateShipsField } from './generateShipsField';
+import { sendTurnResponse } from './sendTurnResponse';
+import { countNumberOfCellsWithShips } from './generateNumberShipCells';
 
 export function startGame(webSocket: WebSocketWithId, gameData) {
   const response = {
@@ -16,14 +19,28 @@ export function startGame(webSocket: WebSocketWithId, gameData) {
     (item) => item.idGame === gamePlayerInfo.gameId
   );
   const playerToAddShipsPosition = gameToStart.players.find(
-    (player) => player.index === webSocket.id
+    (player) => player.index === webSocket.wsUser.index
   );
   console.log(playerToAddShipsPosition);
   playerToAddShipsPosition.shipInfo = gamePlayerInfo.ships;
   if (gameToStart.players.every((players) => players.shipInfo !== undefined)) {
-    const wsSocketsInGame = wsConnections.filter((item) =>
-      gameToStart.players.some((player) => player.index === item.id)
+    playerToAddShipsPosition.turn = true;
+
+    gameToStart.players.every(
+      (player) => (player.shipsField = generateShipsField(player.shipInfo))
     );
+
+    gameToStart.players.every(
+      (player) =>
+        (player.countOFSellsWithShips = countNumberOfCellsWithShips(
+          player.shipsField
+        ))
+    );
+    gameToStart.players.every((player) => (player.countOfSuccessAttaks = 0));
+    const wsSocketsInGame = wsConnections.filter((item) =>
+      gameToStart.players.some((player) => player.index === item.wsUser.index)
+    );
+
     wsSocketsInGame.forEach((item) => {
       const playerID = item.wsUser.index;
       const player = gameToStart.players.find(
@@ -34,5 +51,25 @@ export function startGame(webSocket: WebSocketWithId, gameData) {
       response.data = JSON.stringify(responseData);
       item.send(JSON.stringify(response));
     });
+
+    let playerForTurn = undefined;
+
+    for (let i = 0; i < gameToStart.players.length; i++) {
+      if (gameToStart.players[i].turn === true) {
+        playerForTurn = gameToStart.players[i].index;
+
+        for (let k = 0; k < wsSocketsInGame.length; k++) {
+          if (
+            wsSocketsInGame[k].wsUser.index !== gameToStart.players[i].index
+          ) {
+            sendTurnResponse(wsSocketsInGame[k], playerForTurn);
+          }
+        }
+      }
+    }
+  } else if (
+    gameToStart.players.some((players) => players.shipInfo === undefined)
+  ) {
+    playerToAddShipsPosition.turn = false;
   }
 }

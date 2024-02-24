@@ -32,6 +32,10 @@ export interface RoomUser {
   name: string;
   index: number;
   shipInfo?: undefined;
+  shipsField?: undefined;
+  turn?: boolean;
+  numberOfSellsWithShips?: number;
+  countOfSuccessAttaks?: number;
 }
 
 export interface Game {
