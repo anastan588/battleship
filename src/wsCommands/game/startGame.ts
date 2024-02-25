@@ -21,22 +21,23 @@ export function startGame(webSocket: WebSocketWithId, gameData) {
   const playerToAddShipsPosition = gameToStart.players.find(
     (player) => player.index === webSocket.wsUser.index
   );
+  console.log(gameToStart);
   console.log(playerToAddShipsPosition);
   playerToAddShipsPosition.shipInfo = gamePlayerInfo.ships;
   if (gameToStart.players.every((players) => players.shipInfo !== undefined)) {
     playerToAddShipsPosition.turn = true;
 
-    gameToStart.players.every(
+    gameToStart.players.forEach(
       (player) => (player.shipsField = generateShipsField(player.shipInfo))
     );
 
-    gameToStart.players.every(
+    gameToStart.players.forEach(
       (player) =>
-        (player.countOFSellsWithShips = countNumberOfCellsWithShips(
+        (player.numberOfSellsWithShips = countNumberOfCellsWithShips(
           player.shipsField
         ))
     );
-    gameToStart.players.every((player) => (player.countOfSuccessAttaks = 0));
+    gameToStart.players.forEach((player) => (player.countOfSuccessAttaks = 0));
     const wsSocketsInGame = wsConnections.filter((item) =>
       gameToStart.players.some((player) => player.index === item.wsUser.index)
     );

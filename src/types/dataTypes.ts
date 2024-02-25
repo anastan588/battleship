@@ -42,3 +42,8 @@ export interface Game {
   idGame: number;
   players: RoomUser[];
 }
+
+export interface Winner {
+  name: string;
+  wins: number;
+}

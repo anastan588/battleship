@@ -3,11 +3,14 @@ export function countNumberOfCellsWithShips(shipField) {
   console.log(shipField);
   for (let i = 0; i < shipField.length; i++) {
     for (let k = 0; k < shipField[i].length; k++) {
-      if (shipField[i][k] === 1) {
-        countOFSellsWithShips++;
+      if (Array.isArray(shipField[i][k])) {
+        if (shipField[i][k][0] === 1) {
+          countOFSellsWithShips++;
+        }
       }
     }
   }
-    console.log(countOFSellsWithShips);
+  console.log('count');
+  console.log(countOFSellsWithShips);
   return countOFSellsWithShips;
 }

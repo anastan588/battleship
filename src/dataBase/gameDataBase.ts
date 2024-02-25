@@ -1,4 +1,4 @@
-import WebSocketWithId, { Room, User } from 'types/dataTypes';
+import WebSocketWithId, { Room, User, Winner } from 'types/dataTypes';
 
 export const wsConnections: WebSocketWithId[] = [];
 
@@ -11,6 +11,8 @@ export const roomsInGame: Room[] = [];
 export const games = [];
 
 export const currentPlayersOfGame: User[] = [];
+
+export const winners: Winner[] = [];
 
 export let roomId = 0;
 
