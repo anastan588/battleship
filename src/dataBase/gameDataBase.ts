@@ -16,7 +16,14 @@ export const winners: Winner[] = [];
 
 export let roomId = 0;
 
+export let gameId = 0;
+
+export let playerId = 0;
+
+
 export let webSocketId = 0;
+
+export const isBot = false;
 
 export function setRoomId(newRoomId) {
   roomId = newRoomId;
@@ -26,4 +33,14 @@ export function setRoomId(newRoomId) {
 export function setWebsoketId(newSocketId) {
   webSocketId = newSocketId;
   return webSocketId;
+}
+
+export function setUserId(newUserId) {
+  playerId = newUserId;
+  return playerId;
+}
+
+export function setGameId(newGameId) {
+  gameId = newGameId;
+  return gameId;
 }

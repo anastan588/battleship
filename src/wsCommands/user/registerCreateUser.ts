@@ -1,6 +1,8 @@
 import {
   currentPlayersOfGame,
+  playerId,
   players,
+  setUserId,
   wsConnections,
 } from 'dataBase/gameDataBase';
 import WebSocketWithId, { ResponseRegistration, User } from 'types/dataTypes';
@@ -50,11 +52,14 @@ function createPlayer(
   userpassword,
   response
 ) {
+  let newPlayerID = playerId;
   const newPlayer: User = {
-    index: players.length,
+    index: newPlayerID,
     name: username,
     password: userpassword,
   };
+  newPlayerID ++;
+  setUserId(newPlayerID);
   console.log(newPlayer);
   currentPlayersOfGame.push(newPlayer);
   webSocket.wsUser = newPlayer;

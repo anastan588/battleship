@@ -1,6 +1,8 @@
 import {
+  gameId,
   games,
   roomsInGame,
+  setGameId,
   wsConnections,
 } from 'dataBase/gameDataBase';
 import WebSocketWithId, { Game } from 'types/dataTypes';
@@ -16,10 +18,14 @@ export function createGame(webSocket: WebSocketWithId, roomIndex) {
     idGame: 0,
     idPlayer: 0,
   };
+  let newgameId = gameId;
   const newGame: Game = {
-    idGame: games.length,
+    idGame: newgameId ,
     players: [],
+    isBot: false,
   };
+  newgameId++;
+  setGameId(newgameId);
   roomsInGame[roomIndex].roomUsers.forEach((player) => {
     newGame.players.push(player);
   });
@@ -27,10 +33,10 @@ export function createGame(webSocket: WebSocketWithId, roomIndex) {
   responseData.idGame = newGame.idGame;
 
   const wsSocketsInGame = wsConnections.filter((item) =>
-    newGame.players.some((player) => player.index === item.id)
+    newGame.players.some((player) => player.index === item.wsUser.index)
   );
   const wsSocketsNotInGame = wsConnections.filter((item) =>
-    newGame.players.every((player) => player.index !== item.id)
+    newGame.players.every((player) => player.index !== item.wsUser.index)
   );
   console.log(wsSocketsNotInGame.length);
 

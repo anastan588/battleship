@@ -7,7 +7,7 @@ import { requestHandler } from 'request_handler/reqHandler';
 import WebSocketWithId from 'types/dataTypes';
 import { WebSocketServer } from 'ws';
 
-const WS_PORT = 3000;
+export const WS_PORT = 3000;
 
 const wsServer = new WebSocketServer({ port: WS_PORT });
 

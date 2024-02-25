@@ -5,7 +5,8 @@ import { startGame } from 'wsCommands/game/startGame';
 import { attack } from 'wsCommands/game/attack';
 import { sendWinnersResponse } from 'wsCommands/user/winnersResponse';
 import { wsConnections } from 'dataBase/gameDataBase';
-import { randomAttackGeneratorCell } from 'wsCommands/game/randomattack';
+import { randomAttackGeneratorCell } from 'wsCommands/game/randomAttack';
+import { createGameWithBot } from 'wsCommands/game/gameWithBot';
 
 export function requestHandler(webSocket, data) {
   switch (data.type) {
@@ -30,7 +31,10 @@ export function requestHandler(webSocket, data) {
     case 'randomAttack':
       const dataForAttack = randomAttackGeneratorCell(webSocket, data);
       attack(webSocket, dataForAttack);
-      break;    
+      break;
+    case 'single_play':
+      createGameWithBot(webSocket, data);
+      break;     
     default:
       break;
   }

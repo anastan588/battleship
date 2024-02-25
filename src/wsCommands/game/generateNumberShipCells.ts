@@ -10,7 +10,5 @@ export function countNumberOfCellsWithShips(shipField) {
       }
     }
   }
-  console.log('count');
-  console.log(countOFSellsWithShips);
   return countOFSellsWithShips;
 }

@@ -6,6 +6,7 @@ export function randomAttackGeneratorCell(
   randomAttackData
 ) {
   const randomAttackInfo = JSON.parse(randomAttackData.data);
+  console.log(randomAttackData);
   const currentGame = games.find(
     (item) => item.idGame === randomAttackInfo.gameId
   );
@@ -33,6 +34,7 @@ export function randomAttackGeneratorCell(
     y: y,
     indexPlayer: randomAttackInfo.indexPlayer,
   };
+  console.log(dataForRequestForrandomAttack);
   requestrandomAttackWithCell.data = JSON.stringify(dataForRequestForrandomAttack);
   return requestrandomAttackWithCell;
 }

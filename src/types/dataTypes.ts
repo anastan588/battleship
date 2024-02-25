@@ -41,6 +41,7 @@ export interface RoomUser {
 export interface Game {
   idGame: number;
   players: RoomUser[];
+  isBot: boolean;
 }
 
 export interface Winner {

@@ -3,6 +3,7 @@ import { games, players, winners, wsConnections } from 'dataBase/gameDataBase';
 import { sendTurnResponse } from './sendTurnResponse';
 import { sendFinishResponse } from './finishResponse';
 import { sendWinnersResponse } from 'wsCommands/user/winnersResponse';
+import { randomAttackGeneratorCell } from './randomAttack';
 
 export function attack(webSocket: WebSocketWithId, attackData) {
   const response = {
@@ -12,7 +13,7 @@ export function attack(webSocket: WebSocketWithId, attackData) {
   };
 
   const attackInfo = JSON.parse(attackData.data);
-  console.log(attackInfo);
+
   const responseData = {
     position: {
       x: attackInfo['x'],
@@ -21,23 +22,22 @@ export function attack(webSocket: WebSocketWithId, attackData) {
     currentPlayer: attackInfo.indexPlayer,
     status: undefined,
   };
-  console.log(responseData);
+
   const currentGame = games.find((item) => item.idGame === attackInfo.gameId);
+
   const playerWhoAttacksId = attackInfo.indexPlayer;
   const playerWhoDefeted = currentGame.players.find(
     (item) => item.index !== playerWhoAttacksId
   );
-  console.log(playerWhoDefeted);
+
   const gameField = playerWhoDefeted['shipsField'];
-  console.log(gameField);
+
   const x = attackInfo['x'];
   const y = attackInfo['y'];
-  console.log(x, y);
+
   const wsSocketsInGame = wsConnections.filter((item) =>
     currentGame.players.some((player) => player.index === item.wsUser.index)
   );
-  console.log(gameField[y][x]);
-  console.log(playerWhoDefeted['countOfSuccessAttaks']);
 
   if (Array.isArray(gameField[y][x])) {
     playerWhoDefeted['countOfSuccessAttaks']++;
@@ -98,7 +98,6 @@ export function attack(webSocket: WebSocketWithId, attackData) {
     }
   } else if (gameField[y][x] === 0) {
     responseData.status = 'miss';
-    console.log('pipka');
     const attackPlayer = currentGame.players.find(
       (item) => item.index === playerWhoAttacksId
     );
@@ -133,7 +132,6 @@ export function attack(webSocket: WebSocketWithId, attackData) {
         wins: 1,
       };
       winners.push(winnerObject);
-      console.log(winners);
     }
     sendWinnersResponse(wsConnections);
   } else {
@@ -141,14 +139,38 @@ export function attack(webSocket: WebSocketWithId, attackData) {
     for (let i = 0; i < currentGame.players.length; i++) {
       if (currentGame.players[i].turn === true) {
         playerForTurn = currentGame.players[i].index;
-
-        // for (let k = 0; k < wsSocketsInGame.length; k++) {
-        //   if (wsSocketsInGame[k].wsUser.index !== currentGame.players[i].index) {
-        //     sendTurnResponse(wsSocketsInGame[k], playerForTurn);
-        //   }
-        // }
       }
     }
     wsSocketsInGame.forEach((item) => sendTurnResponse(item, playerForTurn));
+    if (currentGame.isBot === true) {
+      console.log(playerForTurn, 'pupicka');
+      const playerTurnOrder = currentGame.players.find(
+        (item) => item.index === playerForTurn
+      );
+      const plTurnINmassivePlayers = players.find(
+        (item) => (item.index = playerTurnOrder.index)
+      );
+      console.log(players);
+      console.log(playerTurnOrder);
+      console.log(plTurnINmassivePlayers);
+      if (plTurnINmassivePlayers.name.includes('bot')) {
+        console.log(playerForTurn, 'pupicka2');
+        const dataforrandomAttack = {
+          type: 'randomAttack',
+          data: JSON.stringify({
+            gameId: currentGame.idGame,
+            indexPlayer: playerForTurn,
+          }),
+          id: 0,
+        };
+        const dataForAttack = randomAttackGeneratorCell(
+          webSocket,
+          dataforrandomAttack
+        );
+        console.log(dataForAttack);
+        console.log('popetoshka');
+        attack(webSocket, dataForAttack);
+      }
+    }
   }
 }
