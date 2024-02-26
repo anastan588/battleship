@@ -13,6 +13,7 @@ export function createGame(webSocket: WebSocketWithId, roomData) {
   const newGame: Game = {
     idGame: games.length,
     players: [],
+    isBot: false,
   };
   newGame.players.push(webSocket.wsUser);
   games.push(newGame);

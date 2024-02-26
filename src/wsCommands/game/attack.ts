@@ -57,7 +57,6 @@ export function attack(webSocket: WebSocketWithId, attackData) {
       if (gameField[y][x][3] === true) {
         let countOfShotCells = 0;
         for (let k = 1; k <= gameField[y][x][4]; k++) {
-          console.log('popka');
           if (gameField[startPositionY][startPositionX][0] === 2) {
             countOfShotCells += 1;
             console.log(k);
@@ -76,7 +75,6 @@ export function attack(webSocket: WebSocketWithId, attackData) {
       } else if (gameField[y][x][3] === false) {
         let countOfShotCells = 0;
         for (let k = 1; k <= gameField[y][x][4]; k++) {
-          console.log('pupka');
           console.log(gameField[startPositionY][startPositionX]);
           if (gameField[startPositionY][startPositionX][0] === 2) {
             countOfShotCells += 1;
@@ -143,7 +141,6 @@ export function attack(webSocket: WebSocketWithId, attackData) {
     }
     wsSocketsInGame.forEach((item) => sendTurnResponse(item, playerForTurn));
     if (currentGame.isBot === true) {
-      console.log(playerForTurn, 'pupicka');
       const playerTurnOrder = currentGame.players.find(
         (item) => item.index === playerForTurn
       );
@@ -154,7 +151,6 @@ export function attack(webSocket: WebSocketWithId, attackData) {
       console.log(playerTurnOrder);
       console.log(plTurnINmassivePlayers);
       if (plTurnINmassivePlayers.name.includes('bot')) {
-        console.log(playerForTurn, 'pupicka2');
         const dataforrandomAttack = {
           type: 'randomAttack',
           data: JSON.stringify({
@@ -168,7 +164,6 @@ export function attack(webSocket: WebSocketWithId, attackData) {
           dataforrandomAttack
         );
         console.log(dataForAttack);
-        console.log('popetoshka');
         attack(webSocket, dataForAttack);
       }
     }
