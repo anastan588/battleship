@@ -1,5 +1,5 @@
 export function generateShipsField(shipInfo) {
-  //   console.log(shipInfo);
+    console.log(shipInfo);
   const shipsField = Array.from({ length: 10 }, () => new Array(10).fill(0));
   for (let i = 0; i < shipInfo.length; i++) {
     let x = shipInfo[i].position['x'];

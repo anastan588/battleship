@@ -17,11 +17,11 @@ export function randomAttackGeneratorCell(
   const gameField = playerWhoDefeted['shipsField'];
   let x = Math.floor(Math.random() * 10);
   let y = Math.floor(Math.random() * 10);
-  console.log(x, y);
+  // console.log(x, y);
   while (Array.isArray(gameField[y][x]) && gameField[y][x][0] === 2) {
     x = Math.floor(Math.random() * 10);
     y = Math.floor(Math.random() * 10);
-    console.log('circle');
+    // console.log('circle');
   }
   const requestrandomAttackWithCell = {
     id: 0,
@@ -34,7 +34,7 @@ export function randomAttackGeneratorCell(
     y: y,
     indexPlayer: randomAttackInfo.indexPlayer,
   };
-  console.log(dataForRequestForrandomAttack);
+  // console.log(dataForRequestForrandomAttack);
   requestrandomAttackWithCell.data = JSON.stringify(dataForRequestForrandomAttack);
   return requestrandomAttackWithCell;
 }
