@@ -19,7 +19,6 @@ wsServer.on('connection', (webSocket: WebSocketWithId, request) => {
   const newWebsoketID = webSocketId + 1;
   setWebsoketId(newWebsoketID);
   wsConnections.push(webSocket);
-  console.log(webSocket.id);
   webSocket.on('message', (message) => {
     const data = JSON.parse(message.toString());
     console.log('Received message:', data);

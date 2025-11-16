@@ -1,5 +1,4 @@
 export function generateShipsInfoForBot() {
-const shipsField = Array.from({ length: 10 }, () => new Array(10).fill(0));
   const hugeShipObject = {
     count: 1,
     length: 4,

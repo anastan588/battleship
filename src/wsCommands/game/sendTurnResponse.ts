@@ -1,6 +1,6 @@
 import WebSocketWithId from "types/dataTypes";
 
-export function sendTurnResponse(wsConnectionInGame: WebSocketWithId, playerID) {
+export function sendTurnResponse(wsConnectionInGame: WebSocketWithId, playerID: number) {
   const response = {
     id: 0,
     type: 'turn',

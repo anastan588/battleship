@@ -20,12 +20,8 @@ export type Cell = 0 | ShipCell;
 export type GameField = Cell[][];
 
 // --- Safe access helper ---
-function safeCell(
-  gameField: GameField,
-  y: number,
-  x: number
-): Cell | undefined {
-  return gameField[y]?.[x];
+function safeCell(gameField: GameField, y: number, x: number): Cell | undefined {
+  return gameField[Number(y)]?.[Number(x)];
 }
 
 // --- Circle shot helper ---
@@ -54,7 +50,6 @@ export function getGroupNeighbors(
   group: Position[],
   includeDiagonals = true
 ): Position[] {
-  console.log(group);
   const directions: Position[] = [
     { y: -1, x: 0 },
     { y: 1, x: 0 },
@@ -88,7 +83,6 @@ export function getGroupNeighbors(
       }
     }
   }
-  console.log(neighbors);
   return neighbors;
 }
 
@@ -111,20 +105,18 @@ export function attack(webSocket: WebSocketWithId, attackData: any) {
     (item) => item.index !== playerWhoAttacksId
   );
   if (!playerWhoDefeted) return;
-
-  const gameField: GameField = playerWhoDefeted.shipsField;
+  const gameField: GameField = playerWhoDefeted.shipsField!;
   const x = attackInfo.x;
   const y = attackInfo.y;
-
   const wsSocketsInGame = wsConnections.filter((item) =>
-    currentGame.players.some((player) => player.index === item.wsUser.index)
+    currentGame.players.some((player) => player.index === item.wsUser!.index)
   );
 
-  const cell = safeCell(gameField, y, x);
+  const cell = safeCell(gameField, Number(y), Number(x));
   const shipCells: Position[] = [];
   if (Array.isArray(cell)) {
-    // Ship cell
-    playerWhoDefeted.countOfSuccessAttaks++;
+
+    playerWhoDefeted.countOfSuccessAttaks!++;
 
     if (cell[1] === 'small') {
       responseData.status = 'killed';
@@ -138,7 +130,7 @@ export function attack(webSocket: WebSocketWithId, attackData: any) {
       );
       cell[0] = 2;
     } else {
-      // Larger ships
+
       cell[0] = 2;
       const startPosition: Position = cell[2];
       const isVertical = cell[3];
@@ -149,7 +141,7 @@ export function attack(webSocket: WebSocketWithId, attackData: any) {
       shipCells.push({ y, x });
       if (cell[0] === 2) countOfShotCells++;
 
-      // forward direction
+
       let forwardY = y;
       let forwardX = x;
       for (let k = 1; k < shipLength; k++) {
@@ -163,7 +155,7 @@ export function attack(webSocket: WebSocketWithId, attackData: any) {
         shipCells.push({ y: forwardY, x: forwardX });
       }
 
-      // backward direction
+
       let backY = y;
       let backX = x;
       for (let k = 1; k < shipLength; k++) {
@@ -177,7 +169,7 @@ export function attack(webSocket: WebSocketWithId, attackData: any) {
         shipCells.push({ y: backY, x: backX });
       }
 
-      // decide status
+
       if (countOfShotCells === shipLength) {
         responseData.status = 'killed';
         markCircleShot(
@@ -201,7 +193,7 @@ export function attack(webSocket: WebSocketWithId, attackData: any) {
       }
     }
   } else if (cell === 0) {
-    // Miss
+
     responseData.status = 'miss';
     const attackPlayer = currentGame.players.find(
       (item) => item.index === playerWhoAttacksId
@@ -215,10 +207,7 @@ export function attack(webSocket: WebSocketWithId, attackData: any) {
     }
   }
 
-  console.log(responseData, 'responsedata');
-
   if (responseData.status === 'killed') {
-    console.log(shipCells);
     shipCells.forEach((shipcell) => {
       const responseDataAllShip = {
         position: shipcell,
@@ -226,7 +215,6 @@ export function attack(webSocket: WebSocketWithId, attackData: any) {
         status: 'killed',
       };
       response.data = JSON.stringify(responseDataAllShip);
-      console.log(response.data, 'shipcessresponse');
       wsSocketsInGame.forEach((shipcell) =>
         shipcell.send(JSON.stringify(response))
       );
@@ -236,7 +224,7 @@ export function attack(webSocket: WebSocketWithId, attackData: any) {
     wsSocketsInGame.forEach((item) => item.send(JSON.stringify(response)));
   }
 
-  // --- Finish game check ---
+
   if (
     playerWhoDefeted.numberOfSellsWithShips ===
     playerWhoDefeted.countOfSuccessAttaks

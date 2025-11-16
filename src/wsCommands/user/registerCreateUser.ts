@@ -5,10 +5,17 @@ import {
   setUserId,
   wsConnections,
 } from 'dataBase/gameDataBase';
-import WebSocketWithId, { ResponseRegistration, User } from 'types/dataTypes';
+import WebSocketWithId, {
+  RequestPayload,
+  ResponseRegistration,
+  User,
+} from 'types/dataTypes';
 import { sendListRooms } from '../room/upDateRoomResponse';
 
-export function registerCreateUser(webSocket: WebSocketWithId, userData) {
+export function registerCreateUser(
+  webSocket: WebSocketWithId,
+  userData: RequestPayload
+) {
   const response = {
     id: 0,
     type: userData.type,
@@ -16,7 +23,6 @@ export function registerCreateUser(webSocket: WebSocketWithId, userData) {
   };
   const { name, password } = JSON.parse(userData.data);
   const findPlayer = players.filter((item) => item.name === name);
-  console.log(findPlayer);
   if (findPlayer.length === 1) {
     let resPlayerData: ResponseRegistration = {
       index: findPlayer[0].index,
@@ -33,8 +39,20 @@ export function registerCreateUser(webSocket: WebSocketWithId, userData) {
       };
     }
     if (findPlayer[0].password === password) {
-      currentPlayersOfGame.push(findPlayer[0]);
-      webSocket.wsUser = findPlayer[0];
+      const alreadyInGame = currentPlayersOfGame.some(
+        (p) => p.name === findPlayer[0].name
+      );
+      if (alreadyInGame) {
+        resPlayerData = {
+          index: findPlayer[0].index,
+          name: findPlayer[0].name,
+          error: true,
+          errorText: 'User with this name is already in the game',
+        };
+      } else {
+        currentPlayersOfGame.push(findPlayer[0]);
+        webSocket.wsUser = findPlayer[0];
+      }
     }
     response.data = JSON.stringify(resPlayerData);
     webSocket.send(JSON.stringify(response));
@@ -48,9 +66,9 @@ export function registerCreateUser(webSocket: WebSocketWithId, userData) {
 
 function createPlayer(
   webSocket: WebSocketWithId,
-  username,
-  userpassword,
-  response
+  username: string,
+  userpassword: string,
+  response: any
 ) {
   let newPlayerID = playerId;
   const newPlayer: User = {
@@ -58,9 +76,8 @@ function createPlayer(
     name: username,
     password: userpassword,
   };
-  newPlayerID ++;
+  newPlayerID++;
   setUserId(newPlayerID);
-  console.log(newPlayer);
   currentPlayersOfGame.push(newPlayer);
   webSocket.wsUser = newPlayer;
   players.push(newPlayer);
@@ -72,6 +89,5 @@ function createPlayer(
   };
   response.data = JSON.stringify(resPlayerData);
   webSocket.send(JSON.stringify(response));
-  console.log(players);
   sendListRooms(wsConnections);
 }

@@ -20,5 +20,4 @@ export function createGame(webSocket: WebSocketWithId, roomData) {
   response.data.idGame = newGame.idGame;
   response.data.idPlayer = webSocket.wsUser.index;
   webSocket.send(JSON.stringify(response));
-  console.log(games);
 }

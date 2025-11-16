@@ -1,5 +1,5 @@
 import {
-    gameId,
+  gameId,
   games,
   playerId,
   players,
@@ -10,65 +10,62 @@ import {
   wsConnections,
 } from 'dataBase/gameDataBase';
 import WebSocketWithId, { Game, RoomUser, User } from 'types/dataTypes';
-import { countNumberOfCellsWithShips } from './generateNumberShipCells';
-import { generateShipsField } from './generateShipsField';
-import { generateShipsInfoForBot } from './generateRandomShipsInfo';
 import { WebSocketServer } from 'ws';
 import { requestHandler } from 'request_handler/reqHandler';
-import { WS_PORT } from 'websocket_server';
 
 export function createGameWithBot(
   wsConnection: WebSocketWithId,
-  gameWithBotdata
+  gameWithBotdata: any
 ) {
-  const wsConnetionofSinglePlayer = wsConnections.find(
+  const wsConnectionOfSinglePlayer = wsConnections.find(
     (item) => item.id === wsConnection.id
   );
-  const playerIDWithBot = wsConnetionofSinglePlayer.wsUser.index;
+  if (!wsConnectionOfSinglePlayer || !wsConnectionOfSinglePlayer.wsUser) return;
+
+  const playerIDWithBot = wsConnectionOfSinglePlayer.wsUser.index;
   const singlePlayer = players.find((item) => item.index === playerIDWithBot);
-  const response = {
-    id: 0,
-    type: 'create_game',
-    data: '',
-  };
-  const responseData = {
-    idGame: 0,
-    idPlayer: 0,
-  };
+  if (!singlePlayer) return;
+
+  const response = { id: 0, type: 'create_game', data: '' };
+  const responseData = { idGame: 0, idPlayer: 0 };
+
   let newPlayerID = playerId;
   const newPlayerBot: User = {
     index: newPlayerID,
     name: `bot${newPlayerID}`,
     password: '12345',
   };
-  newPlayerID ++;
-  setUserId(newPlayerID);
-  console.log(newPlayerBot);
+  setUserId(++newPlayerID);
   players.push(newPlayerBot);
 
-  const newWsForBot = new WebSocketServer({ port: 3001 });
-  newWsForBot.on('connection', (webSocket: WebSocketWithId, request) => {
-    console.log('WebSocket connected');
+  const newWsForBot = createBotServer(3001);
+  newWsForBot.on('connection', (webSocket: WebSocketWithId) => {
+    console.log('Bot WebSocket connected');
     webSocket.id = webSocketId;
-    const newWebsoketID = webSocketId + 1;
-    setWebsoketId(newWebsoketID);
+    setWebsoketId(webSocketId + 1);
     webSocket.wsUser = newPlayerBot;
     wsConnections.push(webSocket);
-    console.log(webSocket.id);
+
     webSocket.on('message', (message) => {
-      const data = JSON.parse(message.toString());
-      console.log('Received message:', data);
-      requestHandler(webSocket, data);
+      try {
+        const data = JSON.parse(message.toString());
+        console.log('Bot received message:', data);
+        requestHandler(webSocket, data);
+      } catch (err) {
+        console.error('Invalid bot message:', err);
+      }
     });
   });
-  let newgameId = gameId;
+
+ 
+  let newGameId = gameId;
   const newGame: Game = {
-    idGame: newgameId,
+    idGame: newGameId,
     players: [],
     isBot: true,
   };
-  newgameId++;
-  setGameId(newgameId);
+  setGameId(++newGameId);
+
   const playerBot: RoomUser = {
     name: newPlayerBot.name,
     index: newPlayerBot.index,
@@ -76,14 +73,7 @@ export function createGameWithBot(
     numberOfSellsWithShips: 0,
     countOfSuccessAttaks: 0,
   };
-  playerBot.shipInfo = generateShipsInfoForBot();
-  playerBot.shipsField = generateShipsField(playerBot.shipInfo);
-  playerBot.numberOfSellsWithShips = countNumberOfCellsWithShips(
-    playerBot.shipsField
-  );
 
-  newGame.players.push(playerBot);
-  console.log(newGame);
   const singlePlayerWithBot: RoomUser = {
     name: singlePlayer.name,
     index: singlePlayer.index,
@@ -91,16 +81,51 @@ export function createGameWithBot(
     numberOfSellsWithShips: 0,
     countOfSuccessAttaks: 0,
   };
-  newGame.players.push(singlePlayerWithBot);
 
+  newGame.players.push(playerBot, singlePlayerWithBot);
   games.push(newGame);
+
+  // --- Send response to players in game ---
   responseData.idGame = newGame.idGame;
-  const wsSocketsInGame = wsConnections.filter((item) =>
-    newGame.players.some((player) => player.index === item.wsUser.index)
+  const wsSocketsInGame = wsConnections.filter(
+    (item) =>
+      item.wsUser &&
+      newGame.players.some((player) => player.index === item.wsUser.index)
   );
+
   wsSocketsInGame.forEach((item) => {
+    if (!item.wsUser) return;
     responseData.idPlayer = item.wsUser.index;
     response.data = JSON.stringify(responseData);
     item.send(JSON.stringify(response));
   });
+
+  console.log('Game created with bot:', newGame);
+}
+
+function createBotServer(preferredPort: number) {
+  let port = preferredPort;
+
+  const server = new WebSocketServer({ port });
+
+  server.on('listening', () => {
+    console.log(`Bot WebSocket server running on port ${port}`);
+  });
+
+  server.on('error', (err: NodeJS.ErrnoException) => {
+    if (err.code === 'EADDRINUSE') {
+      console.warn(`Port ${port} is already in use. Trying a random port...`);
+      port = Math.floor(Math.random() * (65535 - 1024)) + 1024;
+
+      const fallbackServer = new WebSocketServer({ port });
+      fallbackServer.on('listening', () => {
+        console.log(`Bot WebSocket server running on random port ${port}`);
+      });
+      return fallbackServer;
+    } else {
+      console.error('WebSocket server error:', err);
+    }
+  });
+
+  return server;
 }

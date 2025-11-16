@@ -8,7 +8,7 @@ import {
 import WebSocketWithId, { Game } from 'types/dataTypes';
 import { sendListRooms } from '../room/upDateRoomResponse';
 
-export function createGame(webSocket: WebSocketWithId, roomIndex) {
+export function createGame(webSocket: WebSocketWithId, roomIndex: number) {
   const response = {
     id: 0,
     type: 'create_game',
@@ -33,19 +33,17 @@ export function createGame(webSocket: WebSocketWithId, roomIndex) {
   responseData.idGame = newGame.idGame;
 
   const wsSocketsInGame = wsConnections.filter((item) =>
-    newGame.players.some((player) => player.index === item.wsUser.index)
+    newGame.players.some((player) => player.index === item.wsUser!.index)
   );
   const wsSocketsNotInGame = wsConnections.filter((item) =>
-    newGame.players.every((player) => player.index !== item.wsUser.index)
+    newGame.players.every((player) => player.index !== item.wsUser!.index)
   );
-  console.log(wsSocketsNotInGame.length);
+
 
   wsSocketsInGame.forEach((item) => {
-    responseData.idPlayer = item.wsUser.index;
+    responseData.idPlayer = item.wsUser!.index;
     response.data = JSON.stringify(responseData);
     item.send(JSON.stringify(response));
   });
   sendListRooms(wsConnections);
-  console.log(games);
-  console.log(roomsInGame);
 }

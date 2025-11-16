@@ -7,35 +7,45 @@ import { sendWinnersResponse } from 'wsCommands/user/winnersResponse';
 import { wsConnections } from 'dataBase/gameDataBase';
 import { randomAttackGeneratorCell } from 'wsCommands/game/randomAttack';
 import { createGameWithBot } from 'wsCommands/game/gameWithBot';
+import WebSocketWithId, { RequestPayload } from 'types/dataTypes';
 
-export function requestHandler(webSocket, data) {
+export function requestHandler(webSocket: WebSocketWithId, data: RequestPayload) {
   switch (data.type) {
     case 'create_room':
       createRoom(webSocket, data);
       sendWinnersResponse(wsConnections);
       break;
+
     case 'reg':
       console.log(data);
       registerCreateUser(webSocket, data);
       sendWinnersResponse(wsConnections);
       break;
+
     case 'add_user_to_room':
       addSecondPlayerToRoom(webSocket, data);
       break;
+
     case 'add_ships':
       startGame(webSocket, data);
       break;
+
     case 'attack':
       attack(webSocket, data);
       break;
+
     case 'randomAttack':
       const dataForAttack = randomAttackGeneratorCell(webSocket, data);
       attack(webSocket, dataForAttack);
       break;
+
     case 'single_play':
+      console.log(data);
       createGameWithBot(webSocket, data);
-      break;     
+      break;
+
     default:
       break;
   }
 }
+

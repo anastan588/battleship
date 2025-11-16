@@ -11,5 +11,4 @@ export function sendListRooms(wsConnections: WebSocketWithId[]) {
   wsConnections.forEach((item) => {
     item.send(JSON.stringify(response));
   });
-  console.log(rooms);
 }
